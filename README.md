@@ -2,6 +2,8 @@
 
 An interactive, web-based educational platform designed to visualize, trace, and analyze **Eulerian Graphs**, **Eulerian Paths**, and **Eulerian Circuits**. Featuring an interactive graph sandbox, step-by-step traversal playback controls, real-time degree calculation, and a historical case study on the **Seven Bridges of Königsberg**.
 
+🚀 **Live Demo:** [https://surajit-sahoo-iitian.github.io/Eulerian-Graph-Interactive-Visualization/](https://surajit-sahoo-iitian.github.io/Eulerian-Graph-Interactive-Visualization/)
+
 ---
 
 ## ✨ Features
