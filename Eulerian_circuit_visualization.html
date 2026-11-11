@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eulerian Graphs: Theory, History & Interactive Sandbox</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        canvas { touch-action: none; }
+        .math-symbol { font-family: 'Times New Roman', serif; font-style: italic; }
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-6px) scale(1.02); }
+        }
+        .floating-alert { animation: floatBubble 2.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-white">
+
+    <!-- Header & Branding -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-cyan-500 to-blue-600 p-2.5 rounded-xl shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-route text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Eulerian Graphs: Theory, History & Interactive Sandbox</h1>
+                    <p class="text-xs text-slate-400">Created and authorized by Surajit Sahoo</p>
+                </div>
+            </div>
+            <nav class="flex items-center space-x-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60">
+                <button onclick="switchTab('theory')" id="btn-theory" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-cyan-600 text-white shadow-md">
+                    <i class="fa-solid fa-book-open mr-2"></i>Rigor & Königsberg
+                </button>
+                <button onclick="switchTab('sandbox')" id="btn-sandbox" class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-700/50">
+                    <i class="fa-solid fa-pen-to-square mr-2"></i>Interactive Sandbox
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-grow space-y-10">
+
+        <!-- ================= THEORY & KÖNIGSBERG TAB ================= -->
+        <section id="tab-theory" class="space-y-10">
+            <!-- Hero Introduction -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="max-w-3xl space-y-4">
+                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        <i class="fa-solid fa-graduation-cap mr-2"></i> Rigorous Graph Theory Foundation
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">The Mathematics of Eulerian Walks</h2>
+                    <p class="text-slate-300 leading-relaxed text-sm sm:text-base">
+                        An Eulerian graph contains an <strong>Eulerian circuit</strong>—a closed trail that visits every edge of the graph exactly once. Established by Leonhard Euler in 1736, this solved the historic Seven Bridges of Königsberg puzzle and founded graph theory.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Rigorous Mathematical Definitions Grid -->
+            <div class="space-y-6">
+                <h3 class="text-2xl font-bold">Formal Mathematical Framework & Theorems</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Definition 1 -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">1</div>
+                            <h4 class="text-lg font-bold">Graph <span class="math-symbol">G = (V, E)</span> & Vertex Degree</h4>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Let <span class="math-symbol">G = (V, E)</span> be a finite undirected graph with vertex set <span class="math-symbol">V</span> and edge set <span class="math-symbol">E</span>.
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 font-mono text-xs text-slate-300">
+                            <div><span class="text-cyan-400">deg(v)</span> = |{ e ∈ E : v ∈ e }|</div>
+                            <div class="text-slate-400 text-[11px]">The degree of vertex <span class="math-symbol">v</span> is the count of incident edges. Loops count twice.</div>
+                        </div>
+                    </div>
+
+                    <!-- Definition 2 -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">2</div>
+                            <h4 class="text-lg font-bold">Eulerian Trail, Circuit & Graph</h4>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            An <strong>Eulerian Trail</strong> visits every edge in <span class="math-symbol">E</span> exactly once. An <strong>Eulerian Circuit</strong> is a closed Eulerian trail. An <strong>Eulerian Graph</strong> is a graph containing an Eulerian circuit.
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 text-xs text-slate-300 font-mono">
+                            <div>Trail: Uses all <span class="math-symbol">e ∈ E</span> once.</div>
+                            <div>Circuit: Trail where start vertex = end vertex.</div>
+                        </div>
+                    </div>
+
+                    <!-- Theorem 1 -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">3</div>
+                            <h4 class="text-lg font-bold">Euler's Circuit Theorem</h4>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            A connected graph <span class="math-symbol">G</span> has an <strong>Eulerian circuit</strong> if and only if every vertex in <span class="math-symbol">V</span> has an <span class="text-emerald-400 font-semibold">even degree</span>.
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-emerald-400">
+                            ∀ v ∈ V, deg(v) ≡ 0 (mod 2) ⟺ ∃ Eulerian Circuit
+                        </div>
+                    </div>
+
+                    <!-- Theorem 2 -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold">4</div>
+                            <h4 class="text-lg font-bold">Eulerian Path Theorem</h4>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            A connected graph <span class="math-symbol">G</span> has an <strong>Eulerian path</strong> if and only if exactly <span class="text-blue-400 font-semibold">0 or 2 vertices</span> have an odd degree.
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-blue-400">
+                            |{ v ∈ V : deg(v) is odd }| ∈ {0, 2} ⟺ ∃ Eulerian Path
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Historical Königsberg Bridge Section -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-5">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md">Historical Origin Case Study (1736)</span>
+                        <h3 class="text-2xl font-bold mt-2">The Seven Bridges of Königsberg & The Stucked Walker Simulator</h3>
+                    </div>
+                    <button onclick="loadKonigsbergAndSwitch();" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-water"></i> Simulate Königsberg Failure in Sandbox
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-6 space-y-4 text-sm text-slate-300 leading-relaxed">
+                        <p>
+                            The city of Königsberg was divided by the winding <strong>Pregel River</strong> into two mainland banks (North: <em>Altstadt-Löbenicht</em>, South: <em>Vorstadt-Haberberg</em>) and two central islands: <strong>Kneiphof Island</strong> and <strong>Lomse Island</strong>, connected by exactly <strong>7 bridges</strong>.
+                        </p>
+                        <p>
+                            Citizens attempted to walk through the city crossing every bridge once without retracing. Leonhard Euler proved this was mathematically impossible. When you run the simulation below in the sandbox, watch how the walker gets stuck!
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <div class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Pregel River Geographical Parity Analysis:
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">
+                                Every landmass has <span class="text-amber-400 font-mono">odd degrees</span> (North Bank: 3, South Bank: 3, Kneiphof: 5, Lomse: 3). Because there are 4 odd vertices (greater than 2), no Eulerian path or circuit exists!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Embed Historical Map & Formulation Images with High Clarity -->
+                    <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex flex-col space-y-2 shadow-lg hover:border-cyan-500/40 transition-colors">
+                            <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-map text-cyan-400"></i> Historical Pregel River Map
+                            </span>
+                            <div class="rounded-xl overflow-hidden border border-slate-800 bg-white/95 h-52 flex items-center justify-center p-1">
+                                <img src="Bridges_of_Konigsberg.png" 
+                                     alt="Seven Bridges of Königsberg Historical Map" 
+                                     class="max-w-full max-h-full object-contain rounded drop-shadow-md"
+                                     onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Konigsberg_bridges.png/640px-Konigsberg_bridges.png';">
+                            </div>
+                            <p class="text-[11px] text-slate-400 text-center font-medium">Historical city map with highlighted river & 7 bridges</p>
+                        </div>
+
+                        <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex flex-col space-y-2 shadow-lg hover:border-cyan-500/40 transition-colors">
+                            <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-diagram-project text-cyan-400"></i> Mathematical Abstraction
+                            </span>
+                            <div class="rounded-xl overflow-hidden border border-slate-800 bg-white/95 h-52 flex items-center justify-center p-1">
+                                <img src="Konigsberg_formulation.jpg" 
+                                     alt="Königsberg Graph Abstraction formulation" 
+                                     class="max-w-full max-h-full object-contain rounded drop-shadow-md"
+                                     onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/7_bridges.svg/640px-7_bridges.svg.png';">
+                            </div>
+                            <p class="text-[11px] text-slate-400 text-center font-medium">Eulerian Graph Formulation: 4 Vertices (A–D), 7 Edges (a–g)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SANDBOX TAB ================= -->
+        <section id="tab-sandbox" class="hidden space-y-6">
+            <!-- Sandbox Header & Controls -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900/60 border border-slate-800 p-4 sm:p-6 rounded-2xl shadow-lg">
+                <div class="space-y-1">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-hammer text-cyan-400"></i> Interactive Graph Workspace & Traversal Simulator
+                    </h2>
+                    <p class="text-xs text-slate-400">Click canvas to add Vertex. Drag between Vertices to link Edge. Use Delete Mode to remove individual elements.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="toggleDeleteMode()" id="btn-delete-mode" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-eraser text-amber-400"></i> <span id="delete-mode-label">Delete Mode: OFF</span>
+                    </button>
+                    <button onclick="clearCanvas()" class="px-3.5 py-2 bg-slate-800 hover:bg-red-500/20 hover:border-red-500/50 text-slate-300 hover:text-red-400 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can"></i> Clear All
+                    </button>
+                    <button onclick="loadPreset('konigsberg')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
+                        Preset: Königsberg Bridges
+                    </button>
+                    <button onclick="loadPreset('circuit')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
+                        Preset: Eulerian Circuit
+                    </button>
+                    <button onclick="loadPreset('path')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
+                        Preset: Eulerian Path
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workspace Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Canvas Area -->
+                <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col relative shadow-xl min-h-[500px]">
+                    <div class="absolute top-6 left-6 z-10 flex items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-xs text-slate-300 shadow-md flex-wrap">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span id="canvas-mode-text">Click to add Vertex | Drag between Vertices to link Edge</span>
+                    </div>
+
+                    <div class="flex-grow w-full h-[430px] relative rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800/80 cursor-crosshair">
+                        <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <!-- Slow Traversal Playback Controls Bar -->
+                    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 bg-slate-950/90 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <button onclick="runEulerianCheck()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Graph
+                            </button>
+                            
+                            <!-- Start Vertex Dropdown Selector -->
+                            <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-emerald-500/30 text-xs">
+                                <i class="fa-solid fa-flag-checkered text-emerald-400"></i>
+                                <span class="text-slate-400 font-medium">Start:</span>
+                                <select id="start-vertex-select" onchange="onStartVertexChange(this.value)" class="bg-slate-950 text-emerald-300 font-bold border border-slate-700 rounded-lg px-2 py-1 focus:outline-none focus:border-emerald-400">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Step-by-Step Playback Controls -->
+                        <div class="flex flex-wrap items-center gap-1.5 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
+                            <button onclick="stepPrev()" id="btn-prev" title="Previous Step" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-backward-step"></i> Prev
+                            </button>
+                            <button onclick="startPlayback()" id="btn-play" title="Play Slow Traversal" class="px-3.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-play"></i> Play Traversal (Slow)
+                            </button>
+                            <button onclick="pausePlayback()" id="btn-pause" title="Pause Animation" class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition-all shadow-sm hidden items-center gap-1">
+                                <i class="fa-solid fa-pause"></i> Pause
+                            </button>
+                            <button onclick="stepNext()" id="btn-next" title="Next Step" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition-all">
+                                Next <i class="fa-solid fa-forward-step"></i>
+                            </button>
+                            <button onclick="stopPlayback()" id="btn-stop" title="Stop & Reset Simulation" class="px-3.5 py-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-all">
+                                <i class="fa-solid fa-stop"></i> Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Sidebar & Narration Box -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <h3 class="text-base font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i class="fa-solid fa-square-poll-vertical text-cyan-400"></i> Rigorous Analysis Report
+                        </h3>
+
+                        <!-- Verdict Card -->
+                        <div id="verdict-card" class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
+                            <div class="text-xs text-slate-400 uppercase font-semibold tracking-wider">Theorem Status</div>
+                            <div id="verdict-title" class="text-lg font-bold text-slate-200">Not Analyzed Yet</div>
+                            <p id="verdict-desc" class="text-xs text-slate-400 leading-relaxed">Draw a graph or load a preset, then click "Analyze Graph" or "Play Traversal" to simulate walker.</p>
+                        </div>
+
+                        <!-- Degree Breakdown -->
+                        <div class="space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Vertex Degree Parity <span class="math-symbol">deg(v)</span></div>
+                            <div id="degree-breakdown" class="bg-slate-950 p-3 rounded-xl border border-slate-800 max-h-40 overflow-y-auto space-y-1.5 text-xs font-mono">
+                                <span class="text-slate-500 italic font-sans">No vertices created yet.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Live Narration & Walker Status</div>
+                        <div id="path-trail-box" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-300 min-h-[75px] flex items-center font-mono leading-relaxed">
+                            <span class="font-sans text-slate-500">Click "Play Traversal (Slow)" to start walker simulation...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer / Copyright Notice -->
+    <footer class="bg-slate-900/90 border-t border-slate-800 mt-16 py-6 text-center text-xs text-slate-400 space-y-1">
+        <p>Eulerian Graph Theory Interactive Explorer • Developed for graph algorithms education.</p>
+        <p class="font-semibold text-cyan-400">Created and authorized by Surajit Sahoo</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let currentTab = 'theory';
+        let vertices = [];
+        let edges = [];
+        let deleteMode = false;
+        let selectedStartVertex = 0; // Default start node
+        
+        let canvas, ctx;
+        let isDraggingEdge = false;
+        let dragStartIndex = null;
+        let mouseX = 0, mouseY = 0;
+
+        let analysisResult = null;
+        let simulationStep = 0;
+        let simulationInterval = null;
+        let isSimulating = false;
+        let simulationStepsList = [];
+        let activeSimulationEdges = new Set();
+        let stuckState = null; // Stores { nodeIdx, message } when walker gets stuck
+
+        window.onload = function() {
+            canvas = document.getElementById('graphCanvas');
+            if (canvas) {
+                ctx = canvas.getContext('2d');
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                canvas.addEventListener('mousedown', handleCanvasMouseDown);
+                canvas.addEventListener('mousemove', handleCanvasMouseMove);
+                canvas.addEventListener('mouseup', handleCanvasMouseUp);
+
+                canvas.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = e.touches[0].clientX - rect.left;
+                        mouseY = e.touches[0].clientY - rect.top;
+                        handleCanvasMouseDown({ offsetX: mouseX, offsetY: mouseY });
+                    }
+                });
+                canvas.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 1) {
+                        const rect = canvas.getBoundingClientRect();
+                        mouseX = e.touches[0].clientX - rect.left;
+                        mouseY = e.touches[0].clientY - rect.top;
+                        handleCanvasMouseMove({ offsetX: mouseX, offsetY: mouseY });
+                    }
+                });
+                canvas.addEventListener('touchend', handleCanvasMouseUp);
+            }
+            loadPreset('konigsberg');
+        };
+
+        function populateStartVertexDropdown() {
+            const select = document.getElementById('start-vertex-select');
+            if (!select) return;
+            select.innerHTML = '';
+            
+            if (vertices.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = '-1';
+                opt.textContent = 'None';
+                select.appendChild(opt);
+                return;
+            }
+
+            if (selectedStartVertex >= vertices.length) {
+                selectedStartVertex = 0;
+            }
+
+            vertices.forEach((v, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${v.name || 'v' + (idx + 1)}`;
+                if (idx === selectedStartVertex) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function onStartVertexChange(val) {
+            const idx = parseInt(val, 10);
+            if (!isNaN(idx) && idx >= 0 && idx < vertices.length) {
+                selectedStartVertex = idx;
+                stopPlayback();
+                runEulerianCheck();
+                redrawCanvas();
+            }
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            redrawCanvas();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const btnTheory = document.getElementById('btn-theory');
+            const btnSandbox = document.getElementById('btn-sandbox');
+            const tabTheory = document.getElementById('tab-theory');
+            const tabSandbox = document.getElementById('tab-sandbox');
+
+            if (tabId === 'theory') {
+                btnTheory.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-cyan-600 text-white shadow-md";
+                btnSandbox.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-700/50";
+                tabTheory.classList.remove('hidden');
+                tabSandbox.classList.add('hidden');
+            } else {
+                btnSandbox.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-cyan-600 text-white shadow-md";
+                btnTheory.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-300 hover:text-white hover:bg-slate-700/50";
+                tabSandbox.classList.remove('hidden');
+                tabTheory.classList.add('hidden');
+                setTimeout(() => { resizeCanvas(); }, 50);
+            }
+        }
+
+        function loadKonigsbergAndSwitch() {
+            switchTab('sandbox');
+            loadPreset('konigsberg');
+        }
+
+        function toggleDeleteMode() {
+            deleteMode = !deleteMode;
+            const btn = document.getElementById('btn-delete-mode');
+            const label = document.getElementById('delete-mode-label');
+            const modeText = document.getElementById('canvas-mode-text');
+
+            if (deleteMode) {
+                btn.className = "px-3.5 py-2 bg-amber-600/20 border border-amber-500/50 text-amber-300 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm";
+                label.textContent = "Delete Mode: ON";
+                if(modeText) modeText.textContent = "Click a Vertex or Edge to delete it individually";
+            } else {
+                btn.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5";
+                label.textContent = "Delete Mode: OFF";
+                if(modeText) modeText.textContent = "Click to add Vertex | Drag between Vertices to link Edge | Click Vertex to set Start Point";
+            }
+        }
+
+        function loadPreset(type) {
+            vertices = [];
+            edges = [];
+            selectedStartVertex = 0;
+            stopPlayback();
+            analysisResult = null;
+            if (deleteMode) toggleDeleteMode();
+
+            const w = canvas ? canvas.width : 600;
+            const h = canvas ? canvas.height : 430;
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = Math.min(w, h) * 0.28;
+
+            if (type === 'konigsberg') {
+                vertices.push({ x: cx,         y: cy - r*1.1, name: 'North Bank' });
+                vertices.push({ x: cx,         y: cy + r*1.1, name: 'South Bank' });
+                vertices.push({ x: cx - r*1.2, y: cy,         name: 'Kneiphof' });
+                vertices.push({ x: cx + r*1.2, y: cy,         name: 'Lomse' });
+
+                edges.push({ u: 2, v: 0 }); // Bridge 1
+                edges.push({ u: 2, v: 0 }); // Bridge 2
+                edges.push({ u: 2, v: 1 }); // Bridge 3
+                edges.push({ u: 2, v: 1 }); // Bridge 4
+                edges.push({ u: 2, v: 3 }); // Bridge 5
+                edges.push({ u: 3, v: 0 }); // Bridge 6
+                edges.push({ u: 3, v: 1 }); // Bridge 7
+                selectedStartVertex = 2; // Kneiphof
+            } else if (type === 'circuit') {
+                const n = 5;
+                for (let i = 0; i < n; i++) {
+                    const angle = (i * 2 * Math.PI) / n - Math.PI / 2;
+                    vertices.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle), name: `v${i+1}` });
+                }
+                for (let i = 0; i < n; i++) {
+                    edges.push({ u: i, v: (i + 1) % n });
+                    edges.push({ u: i, v: (i + 2) % n });
+                }
+                selectedStartVertex = 0;
+            } else if (type === 'path') {
+                const scale = r * 0.9;
+                vertices.push({ x: cx - scale*0.6, y: cy + scale*0.6, name: 'v1' });
+                vertices.push({ x: cx + scale*0.6, y: cy + scale*0.6, name: 'v2' });
+                vertices.push({ x: cx + scale*0.6, y: cy - scale*0.2, name: 'v3' });
+                vertices.push({ x: cx - scale*0.6, y: cy - scale*0.2, name: 'v4' });
+                vertices.push({ x: cx,             y: cy - scale*0.9, name: 'v5' });
+
+                edges.push({ u: 0, v: 1 });
+                edges.push({ u: 1, v: 2 });
+                edges.push({ u: 2, v: 4 });
+                edges.push({ u: 4, v: 3 });
+                edges.push({ u: 3, v: 0 });
+                edges.push({ u: 3, v: 1 });
+                selectedStartVertex = 2; // Degree 3 odd node
+            }
+
+            populateStartVertexDropdown();
+            runEulerianCheck();
+            redrawCanvas();
+        }
+
+        function clearCanvas() {
+            vertices = [];
+            edges = [];
+            selectedStartVertex = 0;
+            stopPlayback();
+            analysisResult = null;
+            if (deleteMode) toggleDeleteMode();
+            populateStartVertexDropdown();
+            updateUI();
+            redrawCanvas();
+        }
+
+        function getVertexAtPos(x, y) {
+            const radius = 22;
+            for (let i = 0; i < vertices.length; i++) {
+                const dx = vertices[i].x - x;
+                const dy = vertices[i].y - y;
+                if (Math.sqrt(dx * dx + dy * dy) <= radius) return i;
+            }
+            return -1;
+        }
+
+        function getEdgeAtPos(x, y) {
+            const edgeCounts = {};
+            edges.forEach(ed => {
+                const key = ed.u < ed.v ? `${ed.u}-${ed.v}` : `${ed.v}-${ed.u}`;
+                edgeCounts[key] = (edgeCounts[key] || 0) + 1;
+            });
+
+            const drawnPairs = {};
+            for (let i = 0; i < edges.length; i++) {
+                const ed = edges[i];
+                const uNode = vertices[ed.u];
+                const vNode = vertices[ed.v];
+                if (!uNode || !vNode) continue;
+
+                const key = ed.u < ed.v ? `${ed.u}-${ed.v}` : `${ed.v}-${ed.u}`;
+                const totalParallel = edgeCounts[key];
+                if (!drawnPairs[key]) drawnPairs[key] = 0;
+                const parallelIndex = drawnPairs[key]++;
+
+                let midX = (uNode.x + vNode.x) / 2;
+                let midY = (uNode.y + vNode.y) / 2;
+
+                if (totalParallel > 1) {
+                    const offset = (parallelIndex - (totalParallel - 1) / 2) * 28;
+                    const dx = vNode.x - uNode.x;
+                    const dy = vNode.y - uNode.y;
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    if (len > 0) {
+                        midX += (-dy / len) * (offset * 0.5);
+                        midY += (dx / len) * (offset * 0.5);
+                    }
+                }
+
+                const dist = Math.hypot(midX - x, midY - y);
+                if (dist <= 18) return i;
+            }
+            return -1;
+        }
+
+        function handleCanvasMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.offsetX !== undefined ? e.offsetX : e.clientX - rect.left;
+            const y = e.offsetY !== undefined ? e.offsetY : e.clientY - rect.top;
+
+            const clickedVertex = getVertexAtPos(x, y);
+
+            if (deleteMode) {
+                if (clickedVertex !== -1) {
+                    // Delete vertex and all connected edges
+                    edges = edges.filter(ed => ed.u !== clickedVertex && ed.v !== clickedVertex);
+                    edges.forEach(ed => {
+                        if (ed.u > clickedVertex) ed.u--;
+                        if (ed.v > clickedVertex) ed.v--;
+                    });
+                    vertices.splice(clickedVertex, 1);
+                    if (selectedStartVertex >= vertices.length) selectedStartVertex = Math.max(0, vertices.length - 1);
+                    stopPlayback();
+                    populateStartVertexDropdown();
+                    runEulerianCheck();
+                    redrawCanvas();
+                } else {
+                    // Delete clicked edge individually
+                    const clickedEdge = getEdgeAtPos(x, y);
+                    if (clickedEdge !== -1) {
+                        edges.splice(clickedEdge, 1);
+                        stopPlayback();
+                        runEulerianCheck();
+                        redrawCanvas();
+                    }
+                }
+                return;
+            }
+
+            if (clickedVertex !== -1) {
+                // If user clicks an existing vertex, set it as the selected Start Vertex
+                selectedStartVertex = clickedVertex;
+                populateStartVertexDropdown();
+
+                isDraggingEdge = true;
+                dragStartIndex = clickedVertex;
+                mouseX = x;
+                mouseY = y;
+            } else {
+                if (vertices.length < 15) {
+                    vertices.push({ x, y, name: `v${vertices.length + 1}` });
+                    stopPlayback();
+                    analysisResult = null;
+                    populateStartVertexDropdown();
+                    updateUI();
+                    redrawCanvas();
+                }
+            }
+        }
+
+        function handleCanvasMouseMove(e) {
+            if (deleteMode) return;
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.offsetX !== undefined ? e.offsetX : e.clientX - rect.left;
+            mouseY = e.offsetY !== undefined ? e.offsetY : e.clientY - rect.top;
+
+            if (isDraggingEdge) {
+                redrawCanvas();
+                ctx.beginPath();
+                ctx.moveTo(vertices[dragStartIndex].x, vertices[dragStartIndex].y);
+                ctx.lineTo(mouseX, mouseY);
+                ctx.strokeStyle = '#06b6d4';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function handleCanvasMouseUp(e) {
+            if (deleteMode || !isDraggingEdge) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.offsetX !== undefined ? e.offsetX : mouseX;
+            const y = e.offsetY !== undefined ? e.offsetY : mouseY;
+
+            const targetIndex = getVertexAtPos(x, y);
+            if (targetIndex !== -1 && targetIndex !== dragStartIndex) {
+                edges.push({ u: dragStartIndex, v: targetIndex });
+                stopPlayback();
+                analysisResult = null;
+                updateUI();
+            }
+            isDraggingEdge = false;
+            dragStartIndex = null;
+            redrawCanvas();
+        }
+
+        function runEulerianCheck() {
+            if (vertices.length === 0) {
+                analysisResult = null;
+                updateUI();
+                return;
+            }
+
+            const degrees = new Array(vertices.length).fill(0);
+            const adj = Array.from({ length: vertices.length }, () => []);
+
+            edges.forEach(ed => {
+                degrees[ed.u]++;
+                degrees[ed.v]++;
+                adj[ed.u].push(ed.v);
+                adj[ed.v].push(ed.u);
+            });
+
+            let visitedCount = 0;
+            const visited = new Array(vertices.length).fill(false);
+            let checkStart = selectedStartVertex < vertices.length ? selectedStartVertex : 0;
+            if (degrees[checkStart] === 0) {
+                const found = degrees.findIndex(d => d > 0);
+                if (found !== -1) checkStart = found;
+            }
+
+            const queue = [checkStart];
+            visited[checkStart] = true;
+            visitedCount = 1;
+
+            while(queue.length > 0) {
+                const curr = queue.shift();
+                adj[curr].forEach(neighbor => {
+                    if (!visited[neighbor]) {
+                        visited[neighbor] = true;
+                        visitedCount++;
+                        queue.push(neighbor);
+                    }
+                });
+            }
+
+            const activeVerticesCount = degrees.filter(d => d > 0).length;
+            const isConnected = (edges.length === 0) || (visitedCount >= activeVerticesCount);
+
+            const oddVertices = [];
+            degrees.forEach((deg, idx) => {
+                if (deg % 2 !== 0) oddVertices.push(idx);
+            });
+
+            let isCircuit = false;
+            let isPath = false;
+            let pathResult = [];
+
+            const startNode = selectedStartVertex < vertices.length ? selectedStartVertex : 0;
+
+            if (isConnected && edges.length > 0) {
+                if (oddVertices.length === 0) {
+                    isCircuit = true;
+                    pathResult = findHierholzerPath(adj, true, startNode);
+                } else if (oddVertices.length === 2) {
+                    isPath = true;
+                    // If selected start node is one of the odd degree nodes, start there; otherwise use oddVertices[0]
+                    const startPos = oddVertices.includes(startNode) ? startNode : oddVertices[0];
+                    pathResult = findHierholzerPath(adj, false, startPos);
+                } else {
+                    pathResult = simulateGreedyTraversal(startNode);
+                }
+            } else if (edges.length > 0) {
+                pathResult = simulateGreedyTraversal(startNode);
+            }
+
+            analysisResult = { isConnected, oddVertices, isCircuit, isPath, degrees, pathResult };
+            updateUI();
+            redrawCanvas();
+        }
+
+        // Greedy traversal simulator starting explicitly from the user-selected vertex
+        function simulateGreedyTraversal(start) {
+            const adjEdges = Array.from({ length: vertices.length }, () => []);
+            edges.forEach((ed, eIdx) => {
+                adjEdges[ed.u].push({ target: ed.v, edgeId: eIdx });
+                adjEdges[ed.v].push({ target: ed.u, edgeId: eIdx });
+            });
+
+            const visitedEdges = new Set();
+            const traversalSteps = [];
+            let curr = start;
+
+            traversalSteps.push({ node: curr, fromNode: null, edgeId: null, stuck: false });
+
+            while (true) {
+                const available = adjEdges[curr].filter(item => !visitedEdges.has(item.edgeId));
+                if (available.length === 0) {
+                    stuckState = { nodeIdx: curr, message: `Oh no, I am stuck at "${vertices[curr].name || 'v'+(curr+1)}"! No unvisited bridge left!` };
+                    break;
+                }
+                const nextChoice = available[0];
+                visitedEdges.add(nextChoice.edgeId);
+                traversalSteps.push({
+                    node: nextChoice.target,
+                    fromNode: curr,
+                    edgeId: nextChoice.edgeId,
+                    stuck: false
+                });
+                curr = nextChoice.target;
+            }
+
+            if (visitedEdges.size === edges.length) {
+                stuckState = null;
+            }
+
+            return traversalSteps;
+        }
+
+        function findHierholzerPath(adjList, isCircuit, startNode) {
+            const currAdj = Array.from({ length: vertices.length }, () => []);
+            edges.forEach((ed, eIdx) => {
+                currAdj[ed.u].push({ target: ed.v, edgeId: eIdx });
+                currAdj[ed.v].push({ target: ed.u, edgeId: eIdx });
+            });
+
+            const steps = [];
+            let current = startNode;
+            steps.push({ node: current, fromNode: null, edgeId: null, stuck: false });
+            const usedE = new Set();
+
+            while(true) {
+                const avail = currAdj[current].filter(x => !usedE.has(x.edgeId));
+                if (avail.length === 0) break;
+                const next = avail[0];
+                usedE.add(next.edgeId);
+                steps.push({ node: next.target, fromNode: current, edgeId: next.edgeId, stuck: false });
+                current = next.target;
+            }
+
+            stuckState = null;
+            return steps;
+        }
+
+        function updateUI() {
+            const verdictTitle = document.getElementById('verdict-title');
+            const verdictDesc = document.getElementById('verdict-desc');
+            const verdictCard = document.getElementById('verdict-card');
+            const degreeBreakdown = document.getElementById('degree-breakdown');
+
+            if (!analysisResult) {
+                verdictTitle.textContent = "Not Analyzed Yet";
+                verdictDesc.textContent = "Click 'Analyze Graph' or 'Play Traversal' to evaluate Euler's conditions.";
+                verdictCard.className = "p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2";
+                degreeBreakdown.innerHTML = `<span class="text-slate-500 italic font-sans">No vertices created yet.</span>`;
+                return;
+            }
+
+            let html = '';
+            analysisResult.degrees.forEach((deg, idx) => {
+                const isOdd = deg % 2 !== 0;
+                const isStart = idx === selectedStartVertex;
+                const vLabel = vertices[idx].name || `v${idx+1}`;
+                html += `<div class="flex justify-between items-center py-1 px-2 rounded bg-slate-900 border ${isStart ? 'border-emerald-500/60' : 'border-slate-800/60'}">
+                    <span class="${isStart ? 'text-emerald-400 font-bold' : ''}">${vLabel} ${isStart ? '🏁 (Start)' : ''}</span>
+                    <span class="${isOdd ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold'}">deg = ${deg} (${isOdd ? 'Odd' : 'Even'})</span>
+                </div>`;
+            });
+            degreeBreakdown.innerHTML = html;
+
+            const isKonigsbergCase = edges.length === 7 && analysisResult.oddVertices.length === 4;
+
+            if (isKonigsbergCase) {
+                const startName = vertices[selectedStartVertex] ? (vertices[selectedStartVertex].name || `v${selectedStartVertex+1}`) : 'Selected Node';
+                verdictTitle.textContent = "Königsberg: Impossible ❌";
+                verdictDesc.textContent = `Starting at ${startName}. All 4 landmasses have odd degrees. Playing traversal will start from ${startName} and inevitably get stuck!`;
+                verdictCard.className = "p-4 rounded-xl border border-amber-500/40 bg-amber-950/20 space-y-2";
+            } else if (analysisResult.isCircuit) {
+                verdictTitle.textContent = "Eulerian Circuit Verified! 🎉";
+                verdictDesc.textContent = "All vertex degrees are even. Euler's Circuit Theorem satisfied. Full tour possible starting at any node!";
+                verdictCard.className = "p-4 rounded-xl border border-emerald-500/40 bg-emerald-950/20 space-y-2";
+            } else if (analysisResult.isPath) {
+                verdictTitle.textContent = "Eulerian Path Verified! 🚀";
+                verdictDesc.textContent = "Exactly 2 odd degree vertices. Euler's Path Theorem satisfied.";
+                verdictCard.className = "p-4 rounded-xl border border-blue-500/40 bg-blue-950/20 space-y-2";
+            } else {
+                verdictTitle.textContent = "Not Eulerian ⚠️ (Traversal Will Get Stuck)";
+                verdictDesc.textContent = `Found ${analysisResult.oddVertices.length} odd degree vertices. Starting at selected node, walker will get stuck.`;
+                verdictCard.className = "p-4 rounded-xl border border-amber-500/40 bg-amber-950/20 space-y-2";
+            }
+        }
+
+        function redrawCanvas() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Subtle grid background
+            ctx.fillStyle = '#1e293b';
+            const gridSize = 30;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                for (let y = 0; y < canvas.height; y += gridSize) {
+                    ctx.fillRect(x, y, 1.5, 1.5);
+                }
+            }
+
+            const edgeCounts = {};
+            edges.forEach(ed => {
+                const key = ed.u < ed.v ? `${ed.u}-${ed.v}` : `${ed.v}-${ed.u}`;
+                edgeCounts[key] = (edgeCounts[key] || 0) + 1;
+            });
+
+            const drawnPairs = {};
+            edges.forEach((ed, idx) => {
+                const uNode = vertices[ed.u];
+                const vNode = vertices[ed.v];
+                if (!uNode || !vNode) return;
+
+                const key = ed.u < ed.v ? `${ed.u}-${ed.v}` : `${ed.v}-${ed.u}`;
+                const totalParallel = edgeCounts[key];
+                if (!drawnPairs[key]) drawnPairs[key] = 0;
+                const parallelIndex = drawnPairs[key]++;
+
+                ctx.beginPath();
+                if (totalParallel > 1) {
+                    const offset = (parallelIndex - (totalParallel - 1) / 2) * 28;
+                    const mx = (uNode.x + vNode.x) / 2;
+                    const my = (uNode.y + vNode.y) / 2;
+                    const dx = vNode.x - uNode.x;
+                    const dy = vNode.y - uNode.y;
+                    const len = Math.sqrt(dx*dx + dy*dy);
+                    const nx = -dy / len * offset;
+                    const ny = dx / len * offset;
+                    ctx.moveTo(uNode.x, uNode.y);
+                    ctx.quadraticCurveTo(mx + nx, my + ny, vNode.x, vNode.y);
+                } else {
+                    ctx.moveTo(uNode.x, uNode.y);
+                    ctx.lineTo(vNode.x, vNode.y);
+                }
+
+                if (isSimulating && simulationStep > 0 && activeSimulationEdges.has(idx)) {
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 5;
+                } else {
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 3;
+                }
+                ctx.stroke();
+
+                const midX = (uNode.x + vNode.x) / 2;
+                const midY = (uNode.y + vNode.y) / 2;
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.arc(midX, midY, 10, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = deleteMode ? '#f59e0b' : '#334155';
+                ctx.lineWidth = deleteMode ? 2 : 1;
+                ctx.stroke();
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '10px Fira Code';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(`e${idx+1}`, midX, midY);
+            });
+
+            vertices.forEach((v, idx) => {
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 22, 0, 2 * Math.PI);
+                
+                let isOdd = analysisResult && analysisResult.oddVertices && analysisResult.oddVertices.includes(idx);
+                let isActive = isSimulating && simulationStepsList.length > 0 && simulationStepsList[simulationStep] && simulationStepsList[simulationStep].node === idx;
+                let isStart = idx === selectedStartVertex;
+
+                ctx.fillStyle = isActive ? '#0284c7' : (isStart ? '#065f46' : (isOdd ? '#78350f' : '#0f172a'));
+                ctx.fill();
+                ctx.lineWidth = isStart ? 4 : 3;
+                ctx.strokeStyle = deleteMode ? '#f59e0b' : (isActive ? '#38bdf8' : (isStart ? '#10b981' : (isOdd ? '#f59e0b' : '#06b6d4')));
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(v.name || `v${idx+1}`, v.x, v.y);
+
+                // Start Marker Badge over the selected start node
+                if (isStart) {
+                    ctx.save();
+                    ctx.fillStyle = '#10b981';
+                    ctx.beginPath();
+                    ctx.arc(v.x + 16, v.y - 16, 9, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 9px Inter';
+                    ctx.fillText('S', v.x + 16, v.y - 16);
+                    ctx.restore();
+                }
+            });
+
+            // Draw Walker emoji / stuck indicator if stuck
+            if (isSimulating && stuckState && simulationStep === simulationStepsList.length - 1) {
+                const stuckNode = vertices[stuckState.nodeIdx];
+                if (stuckNode) {
+                    ctx.save();
+                    ctx.font = '24px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('🚶‍♂️❌', stuckNode.x, stuckNode.y - 36);
+                    ctx.restore();
+                }
+            }
+        }
+
+        function startPlayback() {
+            if (!analysisResult) runEulerianCheck();
+            if (!analysisResult || !analysisResult.pathResult || analysisResult.pathResult.length === 0) return;
+
+            simulationStepsList = analysisResult.pathResult;
+            isSimulating = true;
+            document.getElementById('btn-play').classList.add('hidden');
+            document.getElementById('btn-pause').classList.remove('hidden');
+
+            if (simulationInterval) clearInterval(simulationInterval);
+
+            // Slow playback speed (1500ms per step) for clear educational observation
+            simulationInterval = setInterval(() => {
+                if (simulationStep < simulationStepsList.length - 1) {
+                    stepNext();
+                } else {
+                    pausePlayback();
+                }
+            }, 1500);
+        }
+
+        function pausePlayback() {
+            isSimulating = false;
+            if (simulationInterval) clearInterval(simulationInterval);
+            document.getElementById('btn-play').classList.remove('hidden');
+            document.getElementById('btn-pause').classList.add('hidden');
+        }
+
+        function stopPlayback() {
+            pausePlayback();
+            simulationStep = 0;
+            activeSimulationEdges.clear();
+            stuckState = null;
+            const trailBox = document.getElementById('path-trail-box');
+            if (trailBox) trailBox.innerHTML = `<span class="font-sans text-slate-500">Click "Play Traversal (Slow)" to start walker simulation...</span>`;
+            redrawCanvas();
+        }
+
+        function stepNext() {
+            if (!analysisResult) runEulerianCheck();
+            if (!analysisResult || !analysisResult.pathResult || analysisResult.pathResult.length === 0) return;
+            simulationStepsList = analysisResult.pathResult;
+
+            if (simulationStep < simulationStepsList.length - 1) {
+                simulationStep++;
+                const stepObj = simulationStepsList[simulationStep];
+                if (stepObj.edgeId !== null && stepObj.edgeId !== undefined) {
+                    activeSimulationEdges.add(stepObj.edgeId);
+                }
+
+                const trailBox = document.getElementById('path-trail-box');
+                const currNodeName = vertices[stepObj.node].name || `v${stepObj.node+1}`;
+                const prevNodeName = stepObj.fromNode !== null ? (vertices[stepObj.fromNode].name || `v${stepObj.fromNode+1}`) : 'Start';
+                const edgeLabel = stepObj.edgeId !== null ? `via bridge e${stepObj.edgeId+1}` : '';
+
+                let textHtml = `<div><span class="text-cyan-400 font-bold">Step ${simulationStep}:</span> Walker moved to <span class="text-white font-semibold">${currNodeName}</span> ${edgeLabel}.</div>`;
+
+                // Check if this is the last step and we are stuck
+                if (simulationStep === simulationStepsList.length - 1 && stuckState) {
+                    textHtml += `<div class="mt-2 p-2 rounded bg-amber-950/50 border border-amber-500/50 text-amber-300 font-semibold flex items-center gap-2 floating-alert">
+                        <span>💡</span> <span>Oh no, I am stuck! No unvisited bridge left! 🛑</span>
+                    </div>`;
+                }
+
+                trailBox.innerHTML = textHtml;
+                redrawCanvas();
+            } else {
+                pausePlayback();
+                if (stuckState) {
+                    const trailBox = document.getElementById('path-trail-box');
+                    trailBox.innerHTML += `<div class="mt-2 p-2 rounded bg-amber-950/50 border border-amber-500/50 text-amber-300 font-semibold flex items-center gap-2 floating-alert">
+                        <span>💡</span> <span>Oh no, I am stuck! No unvisited bridge left! 🛑</span>
+                    </div>`;
+                }
+            }
+        }
+
+        function stepPrev() {
+            if (!analysisResult || !analysisResult.pathResult || analysisResult.pathResult.length === 0) return;
+            simulationStepsList = analysisResult.pathResult;
+
+            if (simulationStep > 0) {
+                simulationStep--;
+                activeSimulationEdges.clear();
+                for (let i = 1; i <= simulationStep; i++) {
+                    const s = simulationStepsList[i];
+                    if (s.edgeId !== null && s.edgeId !== undefined) {
+                        activeSimulationEdges.add(s.edgeId);
+                    }
+                }
+
+                const trailBox = document.getElementById('path-trail-box');
+                const stepObj = simulationStepsList[simulationStep];
+                const currNodeName = vertices[stepObj.node].name || `v${stepObj.node+1}`;
+                trailBox.innerHTML = `<div><span class="text-cyan-400 font-bold">Step ${simulationStep}:</span> Reverted to <span class="text-white font-semibold">${currNodeName}</span>.</div>`;
+                redrawCanvas();
+            }
+        }
+    </script>
+</body>
+</html>
