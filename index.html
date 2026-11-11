@@ -214,23 +214,30 @@
                     <h2 class="text-xl font-bold flex items-center gap-2">
                         <i class="fa-solid fa-hammer text-cyan-400"></i> Interactive Graph Workspace & Traversal Simulator
                     </h2>
-                    <p class="text-xs text-slate-400">Click canvas to add Vertex. Drag between Vertices to link Edge. Use Delete Mode to remove individual elements.</p>
+                    <p class="text-xs text-slate-400">Select mode below (Add Node, Add Edge, or Delete Mode) to build or edit your graph explicitly.</p>
                 </div>
+                <!-- Sandbox Toolbar Buttons -->
                 <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="toggleDeleteMode()" id="btn-delete-mode" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-eraser text-amber-400"></i> <span id="delete-mode-label">Delete Mode: OFF</span>
+                    <button onclick="setSandboxMode('node')" id="btn-mode-node" class="px-3.5 py-2 bg-cyan-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-circle-plus"></i> Add Node
+                    </button>
+                    <button onclick="setSandboxMode('edge')" id="btn-mode-edge" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-link"></i> Add Edge
+                    </button>
+                    <button onclick="setSandboxMode('delete')" id="btn-mode-delete" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can text-amber-400"></i> Delete Mode
                     </button>
                     <button onclick="clearCanvas()" class="px-3.5 py-2 bg-slate-800 hover:bg-red-500/20 hover:border-red-500/50 text-slate-300 hover:text-red-400 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-trash-can"></i> Clear All
+                        <i class="fa-solid fa-rotate-right"></i> Reset All
                     </button>
                     <button onclick="loadPreset('konigsberg')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
-                        Preset: Königsberg Bridges
+                        Preset: Königsberg
                     </button>
                     <button onclick="loadPreset('circuit')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
-                        Preset: Eulerian Circuit
+                        Preset: Circuit
                     </button>
                     <button onclick="loadPreset('path')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all">
-                        Preset: Eulerian Path
+                        Preset: Path
                     </button>
                 </div>
             </div>
@@ -241,7 +248,7 @@
                 <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col relative shadow-xl min-h-[500px]">
                     <div class="absolute top-6 left-6 z-10 flex items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-xs text-slate-300 shadow-md flex-wrap">
                         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                        <span id="canvas-mode-text">Click to add Vertex | Drag between Vertices to link Edge</span>
+                        <span id="canvas-mode-text">Current Mode: Add Node (Click canvas to create node)</span>
                     </div>
 
                     <div class="flex-grow w-full h-[430px] relative rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800/80 cursor-crosshair">
@@ -331,8 +338,8 @@
         let currentTab = 'theory';
         let vertices = [];
         let edges = [];
-        let deleteMode = false;
-        let selectedStartVertex = 0; // Default start node
+        let sandboxMode = 'node'; // 'node', 'edge', 'delete'
+        let selectedStartVertex = 0; 
         
         let canvas, ctx;
         let isDraggingEdge = false;
@@ -345,7 +352,7 @@
         let isSimulating = false;
         let simulationStepsList = [];
         let activeSimulationEdges = new Set();
-        let stuckState = null; // Stores { nodeIdx, message } when walker gets stuck
+        let stuckState = null;
 
         window.onload = function() {
             canvas = document.getElementById('graphCanvas');
@@ -378,6 +385,34 @@
             }
             loadPreset('konigsberg');
         };
+
+        function setSandboxMode(mode) {
+            sandboxMode = mode;
+            isDraggingEdge = false;
+            dragStartIndex = null;
+
+            const btnNode = document.getElementById('btn-mode-node');
+            const btnEdge = document.getElementById('btn-mode-edge');
+            const btnDelete = document.getElementById('btn-mode-delete');
+            const modeText = document.getElementById('canvas-mode-text');
+
+            // Reset all button styles
+            btnNode.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5";
+            btnEdge.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5";
+            btnDelete.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5";
+
+            if (mode === 'node') {
+                btnNode.className = "px-3.5 py-2 bg-cyan-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md";
+                if(modeText) modeText.textContent = "Current Mode: Add Node (Click canvas to create node)";
+            } else if (mode === 'edge') {
+                btnEdge.className = "px-3.5 py-2 bg-cyan-600 text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-md";
+                if(modeText) modeText.textContent = "Current Mode: Add Edge (Drag from one node to another)";
+            } else if (mode === 'delete') {
+                btnDelete.className = "px-3.5 py-2 bg-amber-600/20 border border-amber-500/50 text-amber-300 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm";
+                if(modeText) modeText.textContent = "Current Mode: Delete (Click node or edge to delete)";
+            }
+            redrawCanvas();
+        }
 
         function populateStartVertexDropdown() {
             const select = document.getElementById('start-vertex-select');
@@ -449,30 +484,13 @@
             loadPreset('konigsberg');
         }
 
-        function toggleDeleteMode() {
-            deleteMode = !deleteMode;
-            const btn = document.getElementById('btn-delete-mode');
-            const label = document.getElementById('delete-mode-label');
-            const modeText = document.getElementById('canvas-mode-text');
-
-            if (deleteMode) {
-                btn.className = "px-3.5 py-2 bg-amber-600/20 border border-amber-500/50 text-amber-300 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm";
-                label.textContent = "Delete Mode: ON";
-                if(modeText) modeText.textContent = "Click a Vertex or Edge to delete it individually";
-            } else {
-                btn.className = "px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5";
-                label.textContent = "Delete Mode: OFF";
-                if(modeText) modeText.textContent = "Click to add Vertex | Drag between Vertices to link Edge | Click Vertex to set Start Point";
-            }
-        }
-
         function loadPreset(type) {
             vertices = [];
             edges = [];
             selectedStartVertex = 0;
             stopPlayback();
             analysisResult = null;
-            if (deleteMode) toggleDeleteMode();
+            setSandboxMode('node');
 
             const w = canvas ? canvas.width : 600;
             const h = canvas ? canvas.height : 430;
@@ -533,7 +551,7 @@
             selectedStartVertex = 0;
             stopPlayback();
             analysisResult = null;
-            if (deleteMode) toggleDeleteMode();
+            setSandboxMode('node');
             populateStartVertexDropdown();
             updateUI();
             redrawCanvas();
@@ -595,9 +613,8 @@
 
             const clickedVertex = getVertexAtPos(x, y);
 
-            if (deleteMode) {
+            if (sandboxMode === 'delete') {
                 if (clickedVertex !== -1) {
-                    // Delete vertex and all connected edges
                     edges = edges.filter(ed => ed.u !== clickedVertex && ed.v !== clickedVertex);
                     edges.forEach(ed => {
                         if (ed.u > clickedVertex) ed.u--;
@@ -610,7 +627,6 @@
                     runEulerianCheck();
                     redrawCanvas();
                 } else {
-                    // Delete clicked edge individually
                     const clickedEdge = getEdgeAtPos(x, y);
                     if (clickedEdge !== -1) {
                         edges.splice(clickedEdge, 1);
@@ -622,48 +638,49 @@
                 return;
             }
 
-            if (clickedVertex !== -1) {
-                // If user clicks an existing vertex, set it as the selected Start Vertex
-                selectedStartVertex = clickedVertex;
-                populateStartVertexDropdown();
-
-                isDraggingEdge = true;
-                dragStartIndex = clickedVertex;
-                mouseX = x;
-                mouseY = y;
-            } else {
-                if (vertices.length < 15) {
+            if (sandboxMode === 'node') {
+                if (clickedVertex === -1 && vertices.length < 15) {
                     vertices.push({ x, y, name: `v${vertices.length + 1}` });
                     stopPlayback();
                     analysisResult = null;
                     populateStartVertexDropdown();
                     updateUI();
                     redrawCanvas();
+                } else if (clickedVertex !== -1) {
+                    // Clicking existing node in Node mode sets it as Start Vertex
+                    selectedStartVertex = clickedVertex;
+                    populateStartVertexDropdown();
+                    redrawCanvas();
+                }
+            } else if (sandboxMode === 'edge') {
+                if (clickedVertex !== -1) {
+                    isDraggingEdge = true;
+                    dragStartIndex = clickedVertex;
+                    mouseX = x;
+                    mouseY = y;
                 }
             }
         }
 
         function handleCanvasMouseMove(e) {
-            if (deleteMode) return;
+            if (sandboxMode !== 'edge' || !isDraggingEdge) return;
             const rect = canvas.getBoundingClientRect();
             mouseX = e.offsetX !== undefined ? e.offsetX : e.clientX - rect.left;
             mouseY = e.offsetY !== undefined ? e.offsetY : e.clientY - rect.top;
 
-            if (isDraggingEdge) {
-                redrawCanvas();
-                ctx.beginPath();
-                ctx.moveTo(vertices[dragStartIndex].x, vertices[dragStartIndex].y);
-                ctx.lineTo(mouseX, mouseY);
-                ctx.strokeStyle = '#06b6d4';
-                ctx.lineWidth = 3;
-                ctx.setLineDash([5, 5]);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
+            redrawCanvas();
+            ctx.beginPath();
+            ctx.moveTo(vertices[dragStartIndex].x, vertices[dragStartIndex].y);
+            ctx.lineTo(mouseX, mouseY);
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
 
         function handleCanvasMouseUp(e) {
-            if (deleteMode || !isDraggingEdge) return;
+            if (sandboxMode !== 'edge' || !isDraggingEdge) return;
             const rect = canvas.getBoundingClientRect();
             const x = e.offsetX !== undefined ? e.offsetX : mouseX;
             const y = e.offsetY !== undefined ? e.offsetY : mouseY;
@@ -740,7 +757,6 @@
                     pathResult = findHierholzerPath(adj, true, startNode);
                 } else if (oddVertices.length === 2) {
                     isPath = true;
-                    // If selected start node is one of the odd degree nodes, start there; otherwise use oddVertices[0]
                     const startPos = oddVertices.includes(startNode) ? startNode : oddVertices[0];
                     pathResult = findHierholzerPath(adj, false, startPos);
                 } else {
@@ -755,7 +771,6 @@
             redrawCanvas();
         }
 
-        // Greedy traversal simulator starting explicitly from the user-selected vertex
         function simulateGreedyTraversal(start) {
             const adjEdges = Array.from({ length: vertices.length }, () => []);
             edges.forEach((ed, eIdx) => {
@@ -928,8 +943,8 @@
                 ctx.beginPath();
                 ctx.arc(midX, midY, 10, 0, 2 * Math.PI);
                 ctx.fill();
-                ctx.strokeStyle = deleteMode ? '#f59e0b' : '#334155';
-                ctx.lineWidth = deleteMode ? 2 : 1;
+                ctx.strokeStyle = sandboxMode === 'delete' ? '#f59e0b' : '#334155';
+                ctx.lineWidth = sandboxMode === 'delete' ? 2 : 1;
                 ctx.stroke();
                 ctx.fillStyle = '#94a3b8';
                 ctx.font = '10px Fira Code';
@@ -949,7 +964,7 @@
                 ctx.fillStyle = isActive ? '#0284c7' : (isStart ? '#065f46' : (isOdd ? '#78350f' : '#0f172a'));
                 ctx.fill();
                 ctx.lineWidth = isStart ? 4 : 3;
-                ctx.strokeStyle = deleteMode ? '#f59e0b' : (isActive ? '#38bdf8' : (isStart ? '#10b981' : (isOdd ? '#f59e0b' : '#06b6d4')));
+                ctx.strokeStyle = sandboxMode === 'delete' ? '#f59e0b' : (isActive ? '#38bdf8' : (isStart ? '#10b981' : (isOdd ? '#f59e0b' : '#06b6d4')));
                 ctx.stroke();
 
                 ctx.fillStyle = '#ffffff';
@@ -958,7 +973,6 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText(v.name || `v${idx+1}`, v.x, v.y);
 
-                // Start Marker Badge over the selected start node
                 if (isStart) {
                     ctx.save();
                     ctx.fillStyle = '#10b981';
@@ -972,7 +986,6 @@
                 }
             });
 
-            // Draw Walker emoji / stuck indicator if stuck
             if (isSimulating && stuckState && simulationStep === simulationStepsList.length - 1) {
                 const stuckNode = vertices[stuckState.nodeIdx];
                 if (stuckNode) {
@@ -996,7 +1009,6 @@
 
             if (simulationInterval) clearInterval(simulationInterval);
 
-            // Slow playback speed (1500ms per step) for clear educational observation
             simulationInterval = setInterval(() => {
                 if (simulationStep < simulationStepsList.length - 1) {
                     stepNext();
@@ -1042,7 +1054,6 @@
 
                 let textHtml = `<div><span class="text-cyan-400 font-bold">Step ${simulationStep}:</span> Walker moved to <span class="text-white font-semibold">${currNodeName}</span> ${edgeLabel}.</div>`;
 
-                // Check if this is the last step and we are stuck
                 if (simulationStep === simulationStepsList.length - 1 && stuckState) {
                     textHtml += `<div class="mt-2 p-2 rounded bg-amber-950/50 border border-amber-500/50 text-amber-300 font-semibold flex items-center gap-2 floating-alert">
                         <span>💡</span> <span>Oh no, I am stuck! No unvisited bridge left! 🛑</span>
